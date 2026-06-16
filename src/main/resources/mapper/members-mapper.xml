@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.myproject02.members.mapper.MembersMapper">
+
+    <insert id="register" parameterType="MembersVO">
+        insert into members(m_id, m_pw, m_name, m_addr, m_email, m_phone)
+        values(#{m_id}, #{m_pw}, #{m_name}, #{m_addr}, #{m_email}, #{m_phone})
+    </insert>
+    <update id="deleteAccount" parameterType="String">
+        update members
+        set m_active = 1, m_active_reg = NOW()
+        where m_id = #{m_id}
+    </update>
+
+    <update id="updateMember" parameterType="MembersVO">
+        update members
+        set m_name = #{m_name}, m_email = #{m_email}, m_phone = #{m_phone},
+        m_addr = #{m_addr}, m_addr2 = #{m_addr2}
+        where m_id = #{m_id} and m_active = 0
+    </update>
+
+    <select id="findById" parameterType="String" resultType="MembersVO">
+        select * from members where m_active = 0 and m_id=#{m_id}
+    </select>
+
+    <!-- 아이디 중복확인 : 0이면 사용 가능, 1 이상이면 중복 -->
+    <select id="checkId" parameterType="String" resultType="int">
+        select count(*) from members where m_id = #{m_id} and m_active = 0
+    </select>
+
+    <delete id="deleteRefreshToken" parameterType="String">
+        delete from refresh_tokens where rt_user_id = #{rt_user_id}
+    </delete>
+
+    <insert id="saveRefreshToken" parameterType="RefreshTokenVO">
+        insert into refresh_tokens (rt_user_id, rt_token)
+        values(#{rt_user_id}, #{rt_token})
+    </insert>
+    <select id="findRefreshToken" parameterType="String" resultType="RefreshTokenVO">
+        select * from refresh_tokens where rt_token=#{rt_token}
+    </select>
+
+    <!-- SNS OAuth 관련 SQL -->
+    <!--   일반 이메일로 회원 조회-->
+    <select id="findByEmail" parameterType="String" resultType="MembersVO">
+        select * from members where m_active = 0 and m_email = #{m_email}
+    </select>
+
+    <!-- SNS 이메일로 회원 조회 -->
+    <select id="findBySnsEmail" resultType="MembersVO">
+        select * from members
+        where m_active = 0
+        <choose>
+            <when test="provider == 'naver'">
+                and sns_email_naver = #{email}
+            </when>
+            <when test="provider == 'kakao'">
+                and sns_email_kakao = #{email}
+            </when>
+        </choose>
+    </select>
+
+    <!-- SNS 회원 등록 (비밀번호 없이) -->
+    <insert id="registerSnsUser" parameterType="MembersVO">
+        insert into members(m_id, m_name, m_email, m_phone, sns_provider,  sns_email_naver, sns_email_kakao)
+        values(#{m_id}, #{m_name}, #{m_email}, #{m_phone}, #{sns_provider}, #{sns_email_naver}, #{sns_email_kakao})
+    </insert>
+
+    <!-- 기존 회원에 SNS 정보 연동 -->
+    <!--COALESCE; 나열된 값 중 NULL이 아닌 첫번째값을 반환하는 SQL-->
+    <update id="updateSnsInfo" parameterType="MembersVO">
+        update members
+        set sns_provider = #{sns_provider},
+            sns_email_naver = COALESCE(#{sns_email_naver}, sns_email_naver),
+            sns_email_kakao = COALESCE(#{sns_email_kakao}, sns_email_kakao)
+        where m_id = #{m_id} and m_active = 0
+    </update>
+
+</mapper>
