@@ -39,6 +39,12 @@ jobs:
           echo "JWT_AT=${{ secrets.JWT_AT }}" >> .env
           echo "JWT_RT=${{ secrets.JWT_RT }}" >> .env
           echo "CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}" >> .env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
+          echo "NAVER_REDIRECT_URI=${{ secrets.NAVER_REDIRECT_URI }}" >> .env
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
+          echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
+          echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> .env
 
       - name: Build and Push Docker Image
         run: |
