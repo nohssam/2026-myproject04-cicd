@@ -45,8 +45,9 @@ public class MembersController {
 
     @PostMapping("/hi")
     public String getHi(){
-        return "Hi World! ";
+        return "Bye World! ";
     }
+
     @GetMapping("/hello2")
     public String getHello2(@RequestParam String msg){
         return  msg + "님 Hello World! ";
